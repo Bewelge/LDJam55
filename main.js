@@ -806,7 +806,7 @@ function tick() {
 
 function update() {
 	const { pentagrams, player, minions, enemies, ticker, path } = gameState
-	if (pentagrams.length < 3 && ticker % (150 * (pentagrams.length || 1)) == 0) {
+	if (pentagrams.length < 3 && ticker % (300 * (pentagrams.length || 1)) == 0) {
 		pentagrams.push(new Pentagram(new Vec2(rndFloat(100, width - 100), -50)))
 	}
 	if (enemies.length < 4 && (ticker - 325) % 550 == 0) {
@@ -823,6 +823,18 @@ function update() {
 	}
 
 	if (ticker > 15000 && enemies.length < 5) {
+		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
+		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
+		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
+	}
+
+	if (ticker > 25000 && enemies.length < 10) {
+		enemies.push(new Enemy(new Vec2(rndFloat(100, width - 100), -10)))
+
+		enemies.push(new Enemy(new Vec2(rndFloat(100, width - 100), -10)))
+
+		enemies.push(new Enemy(new Vec2(rndFloat(100, width - 100), -10)))
+
 		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
 		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
 		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
