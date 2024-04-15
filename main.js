@@ -276,7 +276,9 @@ class Player {
 
 		if (this.hp < 100) {
 			ct.fillStyle = "green"
+			ct.strokeStyle = "black"
 			ct.fillRect(this.p.x - 30, this.p.y - 30, (this.hp / 100) * 60, 7)
+			ct.strokeRect(this.p.x - 30, this.p.y - 30, (this.hp / 100) * 60, 7)
 		}
 
 		if (this.damaged) {
@@ -292,21 +294,20 @@ class Player {
 			}
 		}
 
-		lightCtx.shadowBlur = 25
 		let rgr = lightCtx.createRadialGradient(
 			this.p.x,
 			this.p.y,
 			0,
 			this.p.x,
 			this.p.y,
-			350,
+			450,
 		)
 		rgr.addColorStop(0, "rgba(255,255,255,1)")
-		rgr.addColorStop(0.7, "rgba(255,255,255,0.2)")
+		rgr.addColorStop(0.9, "rgba(255,255,255,0.05)")
 		rgr.addColorStop(1, "rgba(255,255,255,0)")
 		lightCtx.fillStyle = rgr
 		lightCtx.beginPath()
-		this.p.arc(lightCtx, 350)
+		this.p.arc(lightCtx, 450)
 		lightCtx.fill()
 		lightCtx.closePath()
 	}
@@ -392,7 +393,14 @@ class StrongEnemy {
 		offCtx.closePath()
 		if (this.hp < this.maxHp) {
 			ct.fillStyle = "green"
+			ct.strokeStyle = "black"
 			ct.fillRect(
+				this.p.x - this.size * 0.6,
+				this.p.y - this.size * 0.6,
+				(this.hp / this.maxHp) * this.size * 0.6,
+				7,
+			)
+			ct.strokeRect(
 				this.p.x - this.size * 0.6,
 				this.p.y - this.size * 0.6,
 				(this.hp / this.maxHp) * this.size * 0.6,
@@ -400,7 +408,6 @@ class StrongEnemy {
 			)
 		}
 
-		lightCtx.shadowBlur = 25
 		let rgr = lightCtx.createRadialGradient(
 			this.p.x,
 			this.p.y,
@@ -511,7 +518,14 @@ class Enemy {
 		offCtx.closePath()
 		if (this.hp < this.maxHp) {
 			ct.fillStyle = "green"
+			ct.strokeStyle = "black"
 			ct.fillRect(
+				this.p.x - this.size * 0.6,
+				this.p.y - this.size * 0.6,
+				(this.hp / this.maxHp) * this.size * 0.6,
+				7,
+			)
+			ct.strokeRect(
 				this.p.x - this.size * 0.6,
 				this.p.y - this.size * 0.6,
 				(this.hp / this.maxHp) * this.size * 0.6,
@@ -519,7 +533,6 @@ class Enemy {
 			)
 		}
 
-		lightCtx.shadowBlur = 25
 		let rgr = lightCtx.createRadialGradient(
 			this.p.x,
 			this.p.y,
@@ -691,7 +704,6 @@ class Minion {
 		offCtx.fill()
 		offCtx.closePath()
 
-		lightCtx.shadowBlur = 25
 		let rgr = lightCtx.createRadialGradient(
 			this.p.x,
 			this.p.y,
@@ -701,7 +713,7 @@ class Minion {
 			150,
 		)
 		rgr.addColorStop(0, "rgba(255,255,255,1)")
-		rgr.addColorStop(0.7, "rgba(255,255,255,0.2)")
+		rgr.addColorStop(0.7, "rgba(255,255,255,0.05)")
 		rgr.addColorStop(1, "rgba(255,255,255,0)")
 		lightCtx.fillStyle = rgr
 		lightCtx.beginPath()
