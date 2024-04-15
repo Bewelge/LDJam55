@@ -4,6 +4,10 @@ let startScreen = document.querySelector("#startScreen")
 let endScreen = document.querySelector("#endScreen")
 let stats = document.querySelector("#stats")
 
+let instructions = document.querySelector("#instructionButton")
+let infoScreen = document.querySelector("#infoScreen")
+let backButton = document.querySelector("#back")
+
 const width = 2000
 const height = 2000
 const canvas = document.createElement("canvas")
@@ -236,6 +240,7 @@ class Player {
 	}
 	damage(amount) {
 		this.hp -= amount
+		this.damaged = true
 		if (this.hp < 0) {
 			gameState.ended = true
 			audioHandle.playSound("end")
@@ -247,19 +252,22 @@ class Player {
 		this.p.translate(ct)
 		ct.rotate(this.rot)
 		ct.fillRect(-5, -17.5, 10, 35)
-		ct.save()
-		ct.translate(0, -17.5)
-		ct.rotate((Math.abs((gameState.ticker % 21) - 10) / 10) * -1.75)
-		ct.fillRect(-2.5, -2.5, 15, 5)
-		ct.restore()
-		ct.save()
-		ct.translate(0, 17.5)
-		ct.rotate((Math.abs((gameState.ticker % 21) - 10) / 10) * 1.75)
-		ct.fillRect(-2.5, -2.5, 15, 5)
-		ct.restore()
+		if (this.isLoading) {
+			ct.save()
+
+			ct.translate(0, -17.5)
+			ct.rotate((Math.abs((gameState.ticker % 21) - 10) / 10) * -1.75)
+			ct.fillRect(-2.5, -2.5, 15, 5)
+			ct.restore()
+			ct.save()
+			ct.translate(0, 17.5)
+			ct.rotate((Math.abs((gameState.ticker % 21) - 10) / 10) * 1.75)
+			ct.fillRect(-2.5, -2.5, 15, 5)
+			ct.restore()
+		}
 		ct.restore()
 
-		ct.fillStyle = "white"
+		ct.fillStyle = "rgba(0,0,50,1)"
 		ct.beginPath()
 		this.p.arc(ct, 10)
 		ct.fill()
@@ -269,6 +277,19 @@ class Player {
 		if (this.hp < 100) {
 			ct.fillStyle = "green"
 			ct.fillRect(this.p.x - 30, this.p.y - 30, (this.hp / 100) * 60, 7)
+		}
+
+		if (this.damaged) {
+			this.damaged = false
+			offCtx.fillStyle = "rgb(100,10,10)"
+			for (let i = 0; i < 5; i++) {
+				let p = this.p.copy().addAngle(rndAng(), rndInt(-40, 40))
+				let rad = rndFloat(3, 7)
+				offCtx.beginPath()
+				p.arc(offCtx, rad)
+				offCtx.fill()
+				offCtx.closePath()
+			}
 		}
 
 		lightCtx.shadowBlur = 25
@@ -312,7 +333,7 @@ class StrongEnemy {
 		this.img = createCanvas(size, size)
 		let ct = this.img.getContext("2d")
 		ct.lineWidth = 0.5
-		ct.strokeStyle = "red"
+		offCtx.fillStyle = "rgb(100,10,10)"
 		ct.beginPath()
 		for (let i = 0; i < 100; i++) {
 			let rot = (i / 100) * PI2 + rndFloat(-0.1, 0.1)
@@ -336,18 +357,16 @@ class StrongEnemy {
 		const mDis = this.p.distanceTo(player.p)
 		const mDir = this.p.angleTo(player.p)
 		if (mDis < this.size) {
-			this.m.multiply(-1)
+			this.m.multiply(-0.5)
+			this.p.addAngle(mDir, -40)
 			player.damage(this.damageAmount)
+
 			audioHandle.playSound("wet")
+		} else {
+			this.m.addAngle(mDir, 0.53 * this.mSpeed)
 		}
 
 		this.rot = new Vec2().angleTo(this.m)
-
-		if (mDis > 30) {
-			this.m.addAngle(mDir, 0.53 * this.mSpeed)
-		} else {
-			this.m.addAngle(mDir, -0.04)
-		}
 	}
 	render(ct) {
 		const { size } = this
@@ -422,7 +441,7 @@ class Enemy {
 		this.img = createCanvas(size, size)
 		let ct = this.img.getContext("2d")
 		ct.lineWidth = 0.5
-		ct.strokeStyle = "red"
+		offCtx.fillStyle = "rgb(100,10,10)"
 		ct.beginPath()
 		for (let i = 0; i < 100; i++) {
 			let rot = (i / 100) * PI2 + rndFloat(-0.1, 0.1)
@@ -531,6 +550,14 @@ class Minion {
 		this.maxHp = 20
 		this.damageAmount = 5
 		this.initImg()
+		this.level = 0
+	}
+	levelUp() {
+		this.level++
+		this.size = (1 + Math.log(2 + this.level)) * 20
+		this.maxHp = (1 + Math.log(2 + this.level)) * 20
+		this.hp = this.maxHp
+		this.damageAmount = (1 + Math.log(2 + this.level)) * 5
 	}
 	initImg() {
 		const { size } = this
@@ -605,6 +632,11 @@ class Minion {
 				enemy.m.multiply(-1)
 				enemy.damage(this.damageAmount)
 				this.damage(enemy.damageAmount)
+				createParticles(Vec2.middleOf(this.p, enemy.p))
+				if (enemy.hp < 0) {
+					this.levelUp()
+					createParticlesR(enemy.p)
+				}
 			}
 		})
 
@@ -674,7 +706,56 @@ class Minion {
 		lightCtx.closePath()
 	}
 }
-
+let particles = []
+function createParticles(p) {
+	for (let i = 0; i < 10; i++) {
+		let rot = (i / 10) * PI2 + rndFloat(-0.2, 0.2)
+		particles.push({
+			p: p.copy(),
+			rot: rot,
+			speed: rndFloat(1, 5),
+			rad: rndFloat(1, 4),
+			life: rndInt(25, 35),
+		})
+	}
+}
+function renderParticles() {
+	particles = particles.slice(0, 100).filter(p => p.life > 0)
+	particles.forEach(particle => {
+		ctx.fillStyle = "white"
+		particle.life--
+		particle.p.addAngle(particle.rot, particle.speed)
+		ctx.beginPath()
+		particle.p.arc(ctx, particle.rad)
+		ctx.fill()
+		ctx.closePath()
+	})
+}
+let particlesR = []
+function createParticlesR(p) {
+	for (let i = 0; i < 20; i++) {
+		let rot = (i / 10) * PI2 + rndFloat(-0.2, 0.2)
+		particlesR.push({
+			p: p.copy(),
+			rot: rot,
+			speed: rndFloat(4, 5),
+			rad: rndFloat(4, 6),
+			life: rndInt(25, 45),
+		})
+	}
+}
+function renderParticlesR() {
+	particlesR = particlesR.slice(0, 100).filter(p => p.life > 0)
+	particlesR.forEach(particle => {
+		offCtx.fillStyle = "rgb(100,10,10)"
+		particle.life--
+		particle.p.addAngle(particle.rot, particle.speed)
+		ctx.beginPath()
+		particle.p.arc(ctx, particle.rad)
+		ctx.fill()
+		ctx.closePath()
+	})
+}
 function init() {
 	gameState.player = new Player()
 	gameState.enemies = []
@@ -724,13 +805,22 @@ function update() {
 	if (pentagrams.length < 3 && ticker % (150 * (pentagrams.length || 1)) == 0) {
 		pentagrams.push(new Pentagram(new Vec2(rndFloat(100, width - 100), -50)))
 	}
-	if (enemies.length < 4 && (ticker - 325) % 750 == 0) {
+	if (enemies.length < 4 && (ticker - 325) % 550 == 0) {
 		enemies.push(new Enemy(new Vec2(rndFloat(100, width - 100), -10)))
 		if (ticker > 3500) {
 			enemies.push(new Enemy(new Vec2(rndFloat(100, width - 100), -10)))
 		}
 	}
-	if (ticker > 6500 && ticker % 2000 == 0) {
+	if (ticker > 3999 && ticker % 2000 == 0) {
+		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
+		if (ticker > 10000) {
+			enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
+		}
+	}
+
+	if (ticker > 15000 && enemies.length < 5) {
+		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
+		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
 		enemies.push(new StrongEnemy(new Vec2(rndFloat(100, width - 100), -10)))
 	}
 	player.update()
@@ -738,6 +828,9 @@ function update() {
 	gameState.minions = gameState.minions.filter(minion => {
 		if (minion.hp > 0) {
 			return true
+		} else {
+			createParticles(minion.p)
+			return false
 		}
 	})
 	gameState.enemies = gameState.enemies.filter(enemy => {
@@ -761,6 +854,7 @@ function update() {
 
 	if (touchedPentagram) {
 		touchedPentagram.loaded++
+		player.isLoading = true
 		if (!touchedPentagram.playingSound) {
 			touchedPentagram.playingSound = true
 			audioHandle.playSound("oooh")
@@ -779,6 +873,7 @@ function update() {
 			}
 		}
 	} else {
+		player.isLoading = false
 		audioHandle.stopSound("oooh")
 		gameState.pentagrams.forEach(p => (p.playingSound = false))
 	}
@@ -867,6 +962,9 @@ function render(ct) {
 	gameState.minions.forEach(minion => minion.render(ctx))
 	gameState.player.render(ct)
 
+	renderParticles()
+	renderParticlesR()
+
 	lightTexture.needsUpdate = true
 	canvasTexture.needsUpdate = true
 	composer.render()
@@ -894,6 +992,17 @@ window.onload = () => {
 			endScreen.style.display = "none"
 			init()
 		}, 500)
+	})
+
+	backButton.addEventListener("click", () => {
+		startScreen.style.display = "flex"
+		infoScreen.style.display = "none"
+		startScreen.style.opacity = 1
+	})
+	instructions.addEventListener("click", () => {
+		startScreen.style.display = "none"
+		infoScreen.style.display = "flex"
+		infoScreen.style.opacity = 1
 	})
 }
 

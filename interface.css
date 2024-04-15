@@ -12,12 +12,12 @@ html {
 	font-family: monospace;
 	box-sizing: border-box;
 	justify-content: center;
-	align-items: center;
 	background-color: black;
 }
 
 #startScreen,
-#endScreen {
+#endScreen,
+#infoScreen {
 	width: 100%;
 	height: 100%;
 	background-color: black;
@@ -46,11 +46,20 @@ canvas {
 	/* cursor: none; */
 }
 
-#startScreen #titles {
+#startScreen .titles {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	gap: 2rem;
+	color: white;
+}
+#infoScreen .titles {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0rem;
+	color: white;
 }
 h1 {
 	font-size: 72px;
@@ -64,15 +73,18 @@ h4 {
 	margin: 0;
 	text-align: center;
 }
-#startScreen .buttons {
+.buttons {
 	display: flex;
 	gap: 1rem;
+	justify-content: center;
+	align-items: center;
 }
 button {
 	padding: 1rem 2rem;
 	color: white;
 	border: none;
 	outline: none;
+	height: auto;
 	border-radius: 5px;
 	background-color: rgb(0, 0, 0);
 	border: 2px solid white;
@@ -82,10 +94,12 @@ button {
 button:hover {
 	background-color: rgba(20, 20, 50, 1);
 }
-#endScreen {
+#endScreen,
+#infoScreen {
 	display: none;
 	opacity: 0;
 	transition: opacity 0.5s ease-in-out;
+	color: white;
 }
 #gameCanvas {
 	display: none;

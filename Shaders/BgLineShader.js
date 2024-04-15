@@ -234,8 +234,7 @@ float snoise(vec3 v){
         // col.xyz  = mix(col.xyz,light.rgb,light.a);
       // }
       
- 
- 
+  
  
 			gl_FragColor = col ;
 
