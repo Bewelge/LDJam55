@@ -317,8 +317,8 @@ class StrongEnemy {
 		this.rot = rndAng()
 		this.m = new Vec2()
 		this.mSpeed = 0.4
-		this.size = rndInt(45, 75)
-		this.damageAmount = 5
+		this.size = rndInt(75, 75)
+		this.damageAmount = 20
 		this.hp = 250
 		this.maxHp = 250
 		this.initImg()
@@ -546,8 +546,8 @@ class Minion {
 		this.m = new Vec2()
 		this.mSpeed = 1.2
 		this.size = rndInt(15, 25)
-		this.hp = 40
-		this.maxHp = 40
+		this.hp = 30
+		this.maxHp = 30
 		this.damageAmount = 5
 		this.initImg()
 		this.level = 0
@@ -555,7 +555,7 @@ class Minion {
 	levelUp() {
 		this.level++
 		this.size = (1 + Math.log(2 + this.level)) * 20
-		this.maxHp = (1 + Math.log(2 + this.level)) * 20
+		this.maxHp = (1 + Math.log(2 + this.level)) * 30
 		this.hp = this.maxHp
 		this.damageAmount = (1 + Math.log(2 + this.level)) * 5
 	}
@@ -622,14 +622,18 @@ class Minion {
 		// }
 		enemies.forEach(enemy => {
 			let dis = enemy.p.distanceTo(this.p)
-
+			let ang = enemy.p.angleTo(this.p)
 			if (mouseDown && dis < PERCEPTION_DIS * 2) {
 				mDis = dis
 				mDir = this.p.angleTo(enemy.p)
 			}
 			if (dis < (enemy.size + this.size) / 2) {
-				this.m.multiply(-1)
-				enemy.m.multiply(-1)
+				this.m.multiply(-0.2)
+				this.m.addAngle(ang, 0.5)
+				this.p.addAngle(ang, this.size * 0.5)
+				enemy.p.addAngle(ang, -enemy.size * 0.5)
+				enemy.m.multiply(0.2)
+				enemy.m.addAngle(ang, -0.5)
 				enemy.damage(this.damageAmount)
 				this.damage(enemy.damageAmount)
 				createParticles(Vec2.middleOf(this.p, enemy.p))
