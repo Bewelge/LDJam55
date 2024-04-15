@@ -333,7 +333,7 @@ class StrongEnemy {
 		this.img = createCanvas(size, size)
 		let ct = this.img.getContext("2d")
 		ct.lineWidth = 0.5
-		offCtx.fillStyle = "rgb(100,10,10)"
+		ct.strokeStyle = "rgb(150,10,10)"
 		ct.beginPath()
 		for (let i = 0; i < 100; i++) {
 			let rot = (i / 100) * PI2 + rndFloat(-0.1, 0.1)
@@ -409,8 +409,8 @@ class StrongEnemy {
 			this.p.y,
 			50,
 		)
-		rgr.addColorStop(0, "rgba(255,0,0,1)")
-		rgr.addColorStop(0.7, "rgba(255,0,0,0.2)")
+		rgr.addColorStop(0, "rgba(255,0,0,0.5)")
+		rgr.addColorStop(0.7, "rgba(255,0,0,0.05)")
 		rgr.addColorStop(1, "rgba(255,0,0,0)")
 		lightCtx.fillStyle = rgr
 		lightCtx.beginPath()
@@ -441,7 +441,7 @@ class Enemy {
 		this.img = createCanvas(size, size)
 		let ct = this.img.getContext("2d")
 		ct.lineWidth = 0.5
-		offCtx.fillStyle = "rgb(100,10,10)"
+		ct.strokeStyle = "rgb(150,10,10)"
 		ct.beginPath()
 		for (let i = 0; i < 100; i++) {
 			let rot = (i / 100) * PI2 + rndFloat(-0.1, 0.1)
@@ -528,8 +528,8 @@ class Enemy {
 			this.p.y,
 			50,
 		)
-		rgr.addColorStop(0, "rgba(255,0,0,1)")
-		rgr.addColorStop(0.7, "rgba(255,0,0,0.2)")
+		rgr.addColorStop(0, "rgba(255,0,0,.4)")
+		rgr.addColorStop(0.7, "rgba(255,0,0,0.05)")
 		rgr.addColorStop(1, "rgba(255,0,0,0)")
 		lightCtx.fillStyle = rgr
 		lightCtx.beginPath()
@@ -751,7 +751,7 @@ function createParticlesR(p) {
 function renderParticlesR() {
 	particlesR = particlesR.slice(0, 100).filter(p => p.life > 0)
 	particlesR.forEach(particle => {
-		offCtx.fillStyle = "rgb(100,10,10)"
+		ctx.fillStyle = "rgb(150,10,10)"
 		particle.life--
 		particle.p.addAngle(particle.rot, particle.speed)
 		ctx.beginPath()
@@ -771,6 +771,13 @@ function init() {
 	gameState.mostMinions = 0
 
 	renderGround()
+
+	// for (let i = 0; i < 20; i++) {
+	// 	gameState.minions.push(new Minion(Vec2.random()))
+	// }
+	// for (let i = 0; i < 5; i++) {
+	// 	gameState.enemies.push(new Enemy(Vec2.random()))
+	// }
 
 	audioHandle.playSound("bgMusic")
 	// gameState.path = []
