@@ -319,8 +319,8 @@ class StrongEnemy {
 		this.mSpeed = 0.4
 		this.size = rndInt(45, 75)
 		this.damageAmount = 5
-		this.hp = 200
-		this.maxHp = 200
+		this.hp = 250
+		this.maxHp = 250
 		this.initImg()
 	}
 	damage(amount) {
@@ -427,8 +427,8 @@ class Enemy {
 		this.mSpeed = 1
 		this.size = rndInt(15, 25)
 		this.damageAmount = 5
-		this.hp = 20
-		this.maxHp = 20
+		this.hp = 40
+		this.maxHp = 40
 		this.initImg()
 	}
 	damage(amount) {
@@ -546,8 +546,8 @@ class Minion {
 		this.m = new Vec2()
 		this.mSpeed = 1.2
 		this.size = rndInt(15, 25)
-		this.hp = 20
-		this.maxHp = 20
+		this.hp = 40
+		this.maxHp = 40
 		this.damageAmount = 5
 		this.initImg()
 		this.level = 0
